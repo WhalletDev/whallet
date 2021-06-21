@@ -6,9 +6,9 @@ Main features are
     
 1) 2% tax is collected and distributed to holders for HODLing
 2) 10% buyback and marketing tax is collected and 3% of it is sent for marketing fund and othe 6% is used to buyback the tokens
-    
-https://whallet.org
-https://t.me/whalletofficial
+
+    https://whallet.org
+    https://t.me/whalletofficial
 */
 
 // SPDX-License-Identifier: Unlicensed
@@ -458,6 +458,7 @@ contract Whallet is Context, IERC20, Ownable {
     uint256 public _minTxAmountToBB = 0;
     uint256 private minimumTokensBeforeSwap = 200000 * 10**6 * 10**9; 
     uint256 private buyBackUpperLimit = 1 * 10**18;
+    uint256 private baseBalanceBB = 1 * 10**18;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -654,13 +655,12 @@ contract Whallet is Context, IERC20, Ownable {
                 swapTokens(contractTokenBalance);    
             }
             uint256 balance = address(this).balance;
-            if (buyBackEnabled && balance > uint256(1 * 10**18)) {
+            if (buyBackEnabled && balance > baseBalanceBB) {
                 
                 if (balance > buyBackUpperLimit)
                     balance = buyBackUpperLimit;
                 if (amount >= _minTxAmountToBB)
                     buyBackTokens(balance.div(100));
-
             }
         }
         
@@ -906,6 +906,10 @@ contract Whallet is Context, IERC20, Ownable {
     
     function setMinTxAmountToBB(uint256 minTxAmountToBB) external onlyOwner() {
         _minTxAmountToBB = minTxAmountToBB;
+    }
+    
+    function setBaseBalanceBB(uint256 bBalanceBB) external onlyOwner() {
+        baseBalanceBB = bBalanceBB;
     }
     
     function setMarketingDivisor(uint256 divisor) external onlyOwner() {
